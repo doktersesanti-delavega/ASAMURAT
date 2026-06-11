@@ -477,7 +477,7 @@ export default function FormSurat() {
         </div>
       </header>
       
-      <div className="flex-1 p-8 space-y-6 overflow-y-auto bg-slate-50">
+      <div className="flex-1 p-8 space-y-6 overflow-y-auto w-full relative">
         <div className="max-w-4xl mx-auto space-y-6">
           {successMsg && (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg relative flex items-center shadow-sm">

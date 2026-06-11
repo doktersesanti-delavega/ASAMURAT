@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
+import bgImage from '@/assets/images/xiao_yan_watermark_1781186004452.jpg';
+
 export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,8 +80,14 @@ export default function AppLayout() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <Outlet />
+      <main className="flex-1 flex flex-col min-w-0 relative bg-slate-50">
+        <div 
+          className="absolute inset-0 z-0 opacity-[0.15] pointer-events-none bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${bgImage})` }}
+        />
+        <div className="relative z-10 flex-1 flex flex-col overflow-auto h-full">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

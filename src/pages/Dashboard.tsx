@@ -69,7 +69,7 @@ export default function Dashboard() {
         </div>
       </header>
       
-      <div className="flex-1 p-8 space-y-6 overflow-y-auto bg-slate-50">
+      <div className="flex-1 p-8 space-y-6 overflow-y-auto w-full relative">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">

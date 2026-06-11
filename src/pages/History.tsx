@@ -80,7 +80,7 @@ export default function History() {
         </div>
       </header>
 
-      <div className="flex-1 p-8 overflow-y-auto bg-slate-50">
+      <div className="flex-1 p-8 overflow-y-auto w-full relative">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-800">Riwayat Inputan Terakhir</h3>
@@ -88,7 +88,7 @@ export default function History() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+              <thead className="bg-[#f8fafc]/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-3">No. Surat</th>
                   <th className="px-6 py-3">Jenis Surat</th>
