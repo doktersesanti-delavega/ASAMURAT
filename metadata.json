@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Surat Keterangan Sehat",
+  "description": "Aplikasi pengelolaan data pasien dan pembuatan surat keterangan sehat, sakit, buta warna, dan bebas narkoba dengan fitur export PDF. Dibangun dengan arsitektur yang modular dan rapi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
