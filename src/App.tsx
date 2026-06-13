@@ -39,10 +39,10 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/surat/:jenis_surat" element={<Surat />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/tarif" element={<Tarif />} />
-            <Route path="/kasir" element={<Kasir />} />
+            <Route path="/surat/:jenis_surat" element={<ProtectedRoute allowedRoles={['Dokter', 'Pendaftaran', 'SuperAdmin']}><Surat /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute allowedRoles={['Dokter', 'Pendaftaran', 'SuperAdmin']}><History /></ProtectedRoute>} />
+            <Route path="/tarif" element={<ProtectedRoute allowedRoles={['Kasir', 'SuperAdmin']}><Tarif /></ProtectedRoute>} />
+            <Route path="/kasir" element={<ProtectedRoute allowedRoles={['Kasir', 'SuperAdmin']}><Kasir /></ProtectedRoute>} />
             <Route path="/pengguna" element={<ProtectedRoute allowedRoles={['SuperAdmin']}><UsersPage /></ProtectedRoute>} />
           </Route>
           <Route path="/verify/:id" element={<Verify />} />

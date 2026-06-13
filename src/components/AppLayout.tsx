@@ -48,29 +48,34 @@ export default function AppLayout() {
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          <div className="text-[10px] font-bold text-slate-500 uppercase px-3 py-2 tracking-wider">Layanan Surat</div>
-          {[
-            { id: 'skd', label: 'SKD (Sehat)', icon: '📄' },
-            { id: 'ski', label: 'SKI (Istirahat)', icon: '🛌' },
-            { id: 'skb', label: 'SKB (Berobat)', icon: '🏥' },
-            { id: 'catin', label: 'CATIN (Nikah)', icon: '💍' },
-            { id: 'skbn', label: 'SKBN (Narkoba)', icon: '🧪' },
-            { id: 'skh', label: 'SKH (Hamil)', icon: '🤰' },
-            { id: 'sksh', label: 'SKSH (Haji)', icon: '🕋' },
-            { id: 'skv', label: 'SKV (Vaksin)', icon: '💉' }
-          ].map((type) => {
-            const path = `/surat/${type.id}`;
-            const active = isCurrentAction(path);
-            return (
-              <button 
-                key={type.id}
-                onClick={() => navigate(path)}
-                className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
-              >
-                <span className="w-5 text-center">{type.icon}</span> {type.label}
-              </button>
-            );
-          })}
+          
+          {(profile?.role === 'SuperAdmin' || profile?.role === 'Dokter' || profile?.role === 'Pendaftaran') && (
+            <>
+              <div className="text-[10px] font-bold text-slate-500 uppercase px-3 py-2 tracking-wider mt-2">Layanan Surat</div>
+              {[
+                { id: 'skd', label: 'SKD (Sehat)', icon: '📄' },
+                { id: 'ski', label: 'SKI (Istirahat)', icon: '🛌' },
+                { id: 'skb', label: 'SKB (Berobat)', icon: '🏥' },
+                { id: 'catin', label: 'CATIN (Nikah)', icon: '💍' },
+                { id: 'skbn', label: 'SKBN (Narkoba)', icon: '🧪' },
+                { id: 'skh', label: 'SKH (Hamil)', icon: '🤰' },
+                { id: 'sksh', label: 'SKSH (Haji)', icon: '🕋' },
+                { id: 'skv', label: 'SKV (Vaksin)', icon: '💉' }
+              ].map((type) => {
+                const path = `/surat/${type.id}`;
+                const active = isCurrentAction(path);
+                return (
+                  <button 
+                    key={type.id}
+                    onClick={() => navigate(path)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
+                  >
+                    <span className="w-5 text-center">{type.icon}</span> {type.label}
+                  </button>
+                );
+              })}
+            </>
+          )}
           
           <div className="pt-4">
             <div className="text-[10px] font-bold text-slate-500 uppercase px-3 py-2 tracking-wider">Administrasi</div>
@@ -80,24 +85,32 @@ export default function AppLayout() {
             >
               <span className="w-5 text-center">📊</span> Dashboard Terpadu
             </button>
-            <button
-               onClick={() => navigate('/history')}
-               className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/history' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
-            >
-              <span className="w-5 text-center">⏱️</span> Riwayat Entry
-            </button>
-            <button
-               onClick={() => navigate('/kasir')}
-               className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/kasir' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
-            >
-              <span className="w-5 text-center">🧾</span> Antrean Kasir
-            </button>
-            <button
-               onClick={() => navigate('/tarif')}
-               className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/tarif' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
-            >
-              <span className="w-5 text-center">💰</span> Tarif Layanan
-            </button>
+            
+            {(profile?.role === 'SuperAdmin' || profile?.role === 'Dokter' || profile?.role === 'Pendaftaran') && (
+              <button
+                 onClick={() => navigate('/history')}
+                 className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/history' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
+              >
+                <span className="w-5 text-center">⏱️</span> Riwayat Entry
+              </button>
+            )}
+
+            {(profile?.role === 'SuperAdmin' || profile?.role === 'Kasir') && (
+              <>
+                <button
+                   onClick={() => navigate('/kasir')}
+                   className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/kasir' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
+                >
+                  <span className="w-5 text-center">🧾</span> Antrean Kasir
+                </button>
+                <button
+                   onClick={() => navigate('/tarif')}
+                   className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/tarif' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
+                >
+                  <span className="w-5 text-center">💰</span> Tarif Layanan
+                </button>
+              </>
+            )}
             
             {profile?.role === 'SuperAdmin' && (
               <button
