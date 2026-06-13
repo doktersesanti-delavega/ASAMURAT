@@ -10,10 +10,16 @@ export default function Verify() {
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [instansiName, setInstansiName] = useState('Puskesmas Kalitengah');
 
   useEffect(() => {
     async function verifyDoc() {
       try {
+        const { data: instansi } = await supabase.from('pengaturan_instansi').select('nama_instansi').eq('id', 1).maybeSingle();
+        if (instansi?.nama_instansi) {
+          setInstansiName(instansi.nama_instansi);
+        }
+
         const { data: dbData, error } = await supabase
           .from('surat_keterangan')
           .select(`
@@ -63,7 +69,7 @@ export default function Verify() {
               <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4" />
               <CardTitle className="text-2xl text-emerald-800">DOKUMEN VALID</CardTitle>
               <CardDescription className="text-emerald-600 mt-2">
-                Surat Keterangan resmi dikeluarkan oleh Puskesmas Kalitengah
+                Surat Keterangan resmi dikeluarkan oleh {instansiName}
               </CardDescription>
             </div>
           ) : (

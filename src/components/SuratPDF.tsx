@@ -40,9 +40,10 @@ interface SuratPDFProps {
   dataKlinis: any;
   suratId: string;
   nomorSuratFull: string;
+  instansiData?: any;
 }
 
-export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFull }: SuratPDFProps) => {
+export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFull, instansiData }: SuratPDFProps) => {
   const verifyUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/verify/${suratId}`;
   const qrCodeImg = getQrCodeUrl(verifyUrl);
 
@@ -67,6 +68,16 @@ export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFu
   const birthYear = parseYear(patient.tanggal_lahir);
   const calculatedAge = birthYear ? `${new Date().getFullYear() - birthYear} tahun` : '-';
 
+  const titleDinas = instansiData?.dinas_naungan ? instansiData.dinas_naungan.toUpperCase() : 'DINAS KESEHATAN KABUPATEN LAMONGAN';
+  const nameInstansi = instansiData?.nama_instansi ? instansiData.nama_instansi.toUpperCase() : 'PUSKESMAS KALITENGAH';
+  const addressInstansi = instansiData?.alamat || 'Jl. Pemuda No. 1, Kalitengah';
+  const telpInstansi = instansiData?.telepon || '08111111111';
+  const emailInstansi = instansiData?.email || 'info@puskesmaskalitengah.com';
+  const webInstansi = instansiData?.website || 'www.puskesmaskalitengah.com';
+  
+  // Extract city from address heuristically or default to Kalitengah
+  const cityInstansi = addressInstansi.split(',').pop()?.trim() || 'Kalitengah';
+
   return (
     <Document>
       <Page size="A4" style={pageStyle}>
@@ -74,21 +85,20 @@ export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFu
         <View style={styles.header}>
           {/* Logo Kiri */}
           <View style={{ width: 100, height: 100, justifyContent: 'center', alignItems: 'center' }}>
-            <Image src={logoPemkab} style={{ width: 95, height: 95, objectFit: 'contain' }} />
+            <Image src={instansiData?.logo_kiri_url || logoPemkab} style={{ width: 95, height: 95, objectFit: 'contain' }} />
           </View>
           
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>PEMERINTAH KABUPATEN LAMONGAN</Text>
-            <Text style={styles.headerTitle}>DINAS KESEHATAN</Text>
-            <Text style={styles.headerSubtitle}>PUSKESMAS KALITENGAH</Text>
-            <Text style={styles.headerAddress}>Jl. Mahkota No. 100 Desa Dibee Kalitengah Lamongan 62255</Text>
-            <Text style={styles.headerAddress}>Telp. 0322-391971 Email: puskes.kalitengah@gmail.com</Text>
-            <Text style={styles.headerAddress}>Web : https://lamongankab.go.id/puskesmas-kalitengah</Text>
+             <Text style={styles.headerTitle}>{titleDinas}</Text>
+             <Text style={styles.headerSubtitle}>{nameInstansi}</Text>
+             <Text style={styles.headerAddress}>{addressInstansi}</Text>
+             <Text style={styles.headerAddress}>Telp: {telpInstansi} | Email: {emailInstansi}</Text>
+             <Text style={styles.headerAddress}>Web: {webInstansi}</Text>
           </View>
 
           {/* Logo Kanan */}
           <View style={{ width: 100, height: 100, justifyContent: 'center', alignItems: 'center' }}>
-             <Image src={logoPuskesmas} style={{ width: 95, height: 95, objectFit: 'contain' }} />
+             <Image src={instansiData?.logo_kanan_url || logoPuskesmas} style={{ width: 95, height: 95, objectFit: 'contain' }} />
           </View>
         </View>
 
@@ -109,7 +119,7 @@ export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFu
         </Text>
         <Text style={styles.suratNumber}>Nomor : {nomorSuratFull}</Text>
 
-        <Text style={{ marginBottom: 10 }}>Yang bertanda tangan di bawah ini dokter Pemeriksa Puskesmas Kalitengah, menerangkan bahwa :</Text>
+        <Text style={{ marginBottom: 10 }}>Yang bertanda tangan di bawah ini dokter Pemeriksa {nameInstansi}, menerangkan bahwa :</Text>
         
         {/* IDENTITAS */}
         <View style={{ marginLeft: 20, marginBottom: 15 }}>
@@ -187,7 +197,7 @@ export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFu
         {suratType === 'SKB' && (
           <View>
             <Text style={styles.paragraph}>
-              Pada tanggal {new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})} yang bersangkutan <Text style={{fontWeight: 'bold'}}>TELAH BEROBAT</Text> di Puskesmas Kalitengah.
+              Pada tanggal {new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})} yang bersangkutan <Text style={{fontWeight: 'bold'}}>TELAH BEROBAT</Text> di {nameInstansi}.
             </Text>
             <Text style={styles.paragraph}>Demikian surat keterangan ini dibuat untuk dapat dipergunakan seperlunya.</Text>
             
@@ -340,8 +350,8 @@ export const SuratPDF = ({ suratType, patient, dataKlinis, suratId, nomorSuratFu
 
           <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <View style={styles.signatureBlock}>
-              <Text>Kalitengah, {new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}</Text>
-              <Text>{suratType === 'SKV' ? 'Kepala Puskesmas Kalitengah' : 'Dokter Pemeriksa,'}</Text>
+              <Text>{cityInstansi}, {new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}</Text>
+              <Text>{suratType === 'SKV' ? `Kepala ${nameInstansi}` : 'Dokter Pemeriksa,'}</Text>
               <Text style={{ ...styles.signatureName, marginTop: suratType === 'SKV' ? 40 : 60 }}>dr. R.M. Ustadho</Text>
               <Text style={styles.signatureNip}>NIP. 19820506 201412 1 001</Text>
               <Text style={{ marginTop: 2 }}>No SIP-DU1028/SIP.DU/413.111/V/2022</Text>

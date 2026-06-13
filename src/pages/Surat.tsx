@@ -78,6 +78,15 @@ export default function FormSurat() {
 
   const [suratHistory, setSuratHistory] = useState<any[]>([]);
   const [editingSuratId, setEditingSuratId] = useState<string | null>(null);
+  const [instansiData, setInstansiData] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadInstansiData() {
+      const { data } = await supabase.from('pengaturan_instansi').select('*').eq('id', 1).maybeSingle();
+      if (data) setInstansiData(data);
+    }
+    loadInstansiData();
+  }, []);
 
   useEffect(() => {
     async function loadEditData() {
@@ -437,6 +446,25 @@ export default function FormSurat() {
         const { data, error } = await supabase.from('surat_keterangan').insert(suratData).select().single();
         sData = data;
         sError = error;
+
+        if (!error && data) {
+          // Setup pembayaran otomatis (kasir)
+          const { data: tarifData } = await supabase
+            .from('tarif_layanan')
+            .select('tarif_rupiah')
+            .ilike('jenis_pelayanan', `%${currentSuratType}%`)
+            .maybeSingle();
+
+          const tarif = tarifData ? tarifData.tarif_rupiah : 0;
+
+          await supabase.from('pembayaran').insert({
+            surat_keterangan_id: data.id,
+            nomor_kwitansi: `INV-${Date.now()}`,
+            total_bayar: tarif,
+            status: 'PENDING',
+            metode_pembayaran: null
+          });
+        }
       }
       
       if (sError) {
@@ -445,7 +473,7 @@ export default function FormSurat() {
       }
 
       // 4. Generate PDF internally for printing
-      const doc = <SuratPDF suratType={currentSuratType} patient={{...patient, id: patientId}} dataKlinis={dataKlinis} suratId={sData.id} nomorSuratFull={finalNomorSurat} />;
+      const doc = <SuratPDF suratType={currentSuratType} patient={{...patient, id: patientId}} dataKlinis={dataKlinis} suratId={sData.id} nomorSuratFull={finalNomorSurat} instansiData={instansiData} />;
       const blob = await pdf(doc).toBlob();
       
       setGeneratedPdfBlob(blob);

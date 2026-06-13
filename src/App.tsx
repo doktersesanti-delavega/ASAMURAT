@@ -1,25 +1,53 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Surat from './pages/Surat';
 import Verify from './pages/Verify';
 import History from './pages/History';
+import Tarif from './pages/Tarif';
+import Kasir from './pages/Kasir';
+import UsersPage from './pages/UsersPage';
 import AppLayout from './components/AppLayout';
+
+// Komponen pelindung rute yang wajib login
+function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
+  const { session, profile, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="h-screen w-screen flex items-center justify-center bg-slate-50"><div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div></div>;
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && profile && !allowedRoles.includes(profile.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/surat/:jenis_surat" element={<Surat />} />
-          <Route path="/history" element={<History />} />
-        </Route>
-        <Route path="/verify/:id" element={<Verify />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/surat/:jenis_surat" element={<Surat />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/tarif" element={<Tarif />} />
+            <Route path="/kasir" element={<Kasir />} />
+            <Route path="/pengguna" element={<ProtectedRoute allowedRoles={['SuperAdmin']}><UsersPage /></ProtectedRoute>} />
+          </Route>
+          <Route path="/verify/:id" element={<Verify />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
