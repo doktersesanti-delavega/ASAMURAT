@@ -10,20 +10,25 @@ import { SuratPDF } from '@/components/SuratPDF';
 export default function History() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [instansiData, setInstansiData] = useState<any>(null);
   const navigate = useNavigate();
 
   const fetchHistory = async () => {
     try {
-      const { data, error } = await supabase
-        .from('surat_keterangan')
-        .select(`
-          *,
-          pasien (*)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(30);
+      const [{ data }, { data: instData }] = await Promise.all([
+        supabase
+          .from('surat_keterangan')
+          .select(`
+            *,
+            pasien (*),
+            tenaga_medis:dokter_pemeriksa_id (*)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(30),
+        supabase.from('pengaturan_instansi').select('*').eq('id', 1).maybeSingle()
+      ]);
 
-      if (error) throw error;
+      if (instData) setInstansiData(instData);
       setHistory(data || []);
     } catch (err) {
       console.error('Error fetching history:', err);
@@ -46,7 +51,7 @@ export default function History() {
         alert("Data pasien tidak lengkap untuk dicetak.");
         return;
       }
-      const doc = <SuratPDF suratType={row.jenis_surat} patient={row.pasien} dataKlinis={row.data_klinis || {}} suratId={row.id} nomorSuratFull={row.nomor_surat} />;
+      const doc = <SuratPDF suratType={row.jenis_surat} patient={row.pasien} dataKlinis={row.data_klinis || {}} suratId={row.id} nomorSuratFull={row.nomor_surat} instansiData={instansiData} dokterData={row.tenaga_medis} />;
       const blob = await pdf(doc).toBlob();
       window.open(URL.createObjectURL(blob), '_blank');
     } catch (err) {

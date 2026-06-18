@@ -113,12 +113,20 @@ export default function AppLayout() {
             )}
             
             {profile?.role === 'SuperAdmin' && (
-              <button
-                 onClick={() => navigate('/pengguna')}
-                 className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/pengguna' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
-              >
-                <span className="w-5 text-center">👥</span> Manajemen Akun
-              </button>
+              <>
+                <button
+                   onClick={() => navigate('/pengguna')}
+                   className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/pengguna' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
+                >
+                  <span className="w-5 text-center">👥</span> Manajemen Akun
+                </button>
+                <button
+                   onClick={() => navigate('/pengaturan')}
+                   className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium ${location.pathname === '/pengaturan' ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800 hover:text-white'}`}
+                >
+                  <span className="w-5 text-center">⚙️</span> Pengaturan Instansi
+                </button>
+              </>
             )}
           </div>
         </nav>

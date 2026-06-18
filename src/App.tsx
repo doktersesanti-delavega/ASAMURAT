@@ -9,6 +9,7 @@ import History from './pages/History';
 import Tarif from './pages/Tarif';
 import Kasir from './pages/Kasir';
 import UsersPage from './pages/UsersPage';
+import Pengaturan from './pages/Pengaturan';
 import AppLayout from './components/AppLayout';
 
 // Komponen pelindung rute yang wajib login
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/tarif" element={<ProtectedRoute allowedRoles={['Kasir', 'SuperAdmin']}><Tarif /></ProtectedRoute>} />
             <Route path="/kasir" element={<ProtectedRoute allowedRoles={['Kasir', 'SuperAdmin']}><Kasir /></ProtectedRoute>} />
             <Route path="/pengguna" element={<ProtectedRoute allowedRoles={['SuperAdmin']}><UsersPage /></ProtectedRoute>} />
+            <Route path="/pengaturan" element={<ProtectedRoute allowedRoles={['SuperAdmin']}><Pengaturan /></ProtectedRoute>} />
           </Route>
           <Route path="/verify/:id" element={<Verify />} />
         </Routes>

@@ -79,11 +79,21 @@ export default function FormSurat() {
   const [suratHistory, setSuratHistory] = useState<any[]>([]);
   const [editingSuratId, setEditingSuratId] = useState<string | null>(null);
   const [instansiData, setInstansiData] = useState<any>(null);
+  const [allTenagaMedis, setAllTenagaMedis] = useState<any[]>([]);
+  const [selectedDokterId, setSelectedDokterId] = useState<string>('');
 
   useEffect(() => {
     async function loadInstansiData() {
       const { data } = await supabase.from('pengaturan_instansi').select('*').eq('id', 1).maybeSingle();
       if (data) setInstansiData(data);
+
+      const { data: medis } = await supabase.from('tenaga_medis').select('*');
+      if (medis) {
+        setAllTenagaMedis(medis);
+        if (medis.length > 0) {
+          setSelectedDokterId(medis[0].id);
+        }
+      }
     }
     loadInstansiData();
   }, []);
@@ -432,16 +442,9 @@ export default function FormSurat() {
            jenis_surat: currentSuratType.toUpperCase(), 
            pasien_id: patientId, 
            data_klinis: dataKlinis, 
-           nomor_surat: finalNomorSurat
-           // We do not have login sessions hooked up fully to get tenaga_medis id,
-           // for now we lookup dr. R.M. Ustadho if possible, or null
+           nomor_surat: finalNomorSurat,
+           dokter_pemeriksa_id: selectedDokterId || null
         };
-  
-        // Try looking up the doctor
-        const { data: drData } = await supabase.from('tenaga_medis').select('id').ilike('nama_lengkap', '%Ustadho%').maybeSingle();
-        if (drData) {
-          (suratData as any).dokter_pemeriksa_id = drData.id;
-        }
   
         const { data, error } = await supabase.from('surat_keterangan').insert(suratData).select().single();
         sData = data;
@@ -473,7 +476,8 @@ export default function FormSurat() {
       }
 
       // 4. Generate PDF internally for printing
-      const doc = <SuratPDF suratType={currentSuratType} patient={{...patient, id: patientId}} dataKlinis={dataKlinis} suratId={sData.id} nomorSuratFull={finalNomorSurat} instansiData={instansiData} />;
+      const dokterData = allTenagaMedis.find(d => d.id === selectedDokterId);
+      const doc = <SuratPDF suratType={currentSuratType} patient={{...patient, id: patientId}} dataKlinis={dataKlinis} suratId={sData.id} nomorSuratFull={finalNomorSurat} instansiData={instansiData} dokterData={dokterData} />;
       const blob = await pdf(doc).toBlob();
       
       setGeneratedPdfBlob(blob);
@@ -548,7 +552,8 @@ export default function FormSurat() {
                        <button 
                          onClick={async () => {
                            try {
-                             const doc = <SuratPDF suratType={currentSuratType} patient={{...patient, id: patient?.id}} dataKlinis={riwayat.data_klinis} suratId={riwayat.id} nomorSuratFull={riwayat.nomor_surat} />;
+                             let histDokterData = allTenagaMedis.find(d => d.id === riwayat.dokter_pemeriksa_id) || allTenagaMedis[0];
+                             const doc = <SuratPDF suratType={currentSuratType} patient={{...patient, id: patient?.id}} dataKlinis={riwayat.data_klinis} suratId={riwayat.id} nomorSuratFull={riwayat.nomor_surat} instansiData={instansiData} dokterData={histDokterData} />;
                              const blob = await pdf(doc).toBlob();
                              window.open(URL.createObjectURL(blob), '_blank');
                            } catch (err) {
@@ -638,6 +643,27 @@ export default function FormSurat() {
             </CardHeader>
             <CardContent className="pt-6">
               {renderDiagnosticForm()}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border-slate-200 shadow-sm rounded-xl">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="text-sm font-bold text-slate-800">Verifikasi Dokter</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-slate-600 uppercase">Dokter Pemeriksa / Penandatangan</Label>
+                <select 
+                  className="flex h-10 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  value={selectedDokterId}
+                  onChange={(e) => setSelectedDokterId(e.target.value)}
+                >
+                  {allTenagaMedis.map(d => (
+                    <option key={d.id} value={d.id}>{d.nama_lengkap} - {d.jabatan}</option>
+                  ))}
+                  {allTenagaMedis.length === 0 && <option value="">Belum ada data dokter (Atur di Pengaturan)</option>}
+                </select>
+              </div>
             </CardContent>
           </Card>
 
